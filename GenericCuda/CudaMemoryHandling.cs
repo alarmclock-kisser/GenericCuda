@@ -322,7 +322,7 @@ namespace GenericCuda
 			Buffers.Add(pointers, sizes);
 
 			// Log
-			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1);
+			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
 
 			// Return index pointer
 			return indexPointer;
@@ -374,7 +374,7 @@ namespace GenericCuda
 			Buffers.Add(pointers, sizes);
 			
 			// Log
-			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1);
+			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
 			
 			// Return index pointer
 			return indexPointer;

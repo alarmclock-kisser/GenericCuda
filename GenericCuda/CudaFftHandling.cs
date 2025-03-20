@@ -9,13 +9,13 @@ namespace GenericCuda
 	{
 		// ----- ATTRIBUTES ----- \\
 		public CudaHandling CudaH;
-
 		private PrimaryContext Ctx;
 
+		private ListBox LogBox;
 
 
 		// ----- OBJECTS ----- \\
-		ListBox LogBox;
+
 
 
 
@@ -24,7 +24,6 @@ namespace GenericCuda
 		public CudaMemoryHandling? MemH => CudaH.MemH;
 		public List<CUdeviceptr[]> Buffers => MemH?.Buffers.Keys.ToList() ?? [];
 		public List<int[]> BufferSizes => MemH?.Buffers.Values.ToList() ?? [];
-
 		public long[] IndexPointers => MemH?.IndexPointers ?? [];
 
 
@@ -143,7 +142,7 @@ namespace GenericCuda
 			MemH?.Buffers.Add(results, sizes);
 
 			// Log success
-			Log("FFT completed", "Buffers: " + buffers.LongLength + ", Ptr: " + indexPointer, 1);
+			Log("FFT completed", "Buffers: " + buffers.LongLength + ", Ptr: " + indexPointer, 1, true);
 
 
 			// Return index pointer
@@ -211,7 +210,7 @@ namespace GenericCuda
 			MemH?.Buffers.Add(results, sizes);
 
 			// Log success
-			Log("FFT completed", "Buffers: " + buffers.LongLength + ", Ptr: " + indexPointer, 1);
+			Log("FFT completed", "Buffers: " + buffers.LongLength + ", Ptr: " + indexPointer, 1, true);
 
 
 			// Return index pointer

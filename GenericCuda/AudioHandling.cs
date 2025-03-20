@@ -51,7 +51,6 @@ namespace GenericCuda
 
 
 		// ----- METHODS ----- \\
-
 		private void OnMouseWheel(object? sender, MouseEventArgs e)
 		{
 			if (CurrentTrack == null) return;
@@ -254,6 +253,7 @@ namespace GenericCuda
 
 
 		// ----- METHODS ----- \\
+		// Dispose
 		public void Dispose()
 		{
 			// Dispose data & reset pointer
@@ -261,6 +261,21 @@ namespace GenericCuda
 			this.Pointer = 0;
 		}
 
+
+		// Get Meta
+		public string GetMeta()
+		{
+			StringBuilder sb = new();
+			sb.Append(Samplerate / 1000 + " kHz, ");
+			sb.Append(Bitdepth + " b, ");
+			sb.Append(Channels + " ch, ");
+			sb.Append((Data.Length / Samplerate / Channels / Bitdepth / 8) + " s, ");
+			sb.Append(Data.LongLength + " samples");
+			return sb.ToString();
+		}
+
+
+		// I/O
 		public byte[] GetBytes()
 		{
 			int bytesPerSample = Bitdepth / 8;
@@ -357,6 +372,8 @@ namespace GenericCuda
 			}
 		}
 
+
+		// Playback
 		public void PlayStop(Button? playbackButton = null)
 		{
 			if (Player.PlaybackState == PlaybackState.Playing)
@@ -410,6 +427,8 @@ namespace GenericCuda
 			}
 		}
 
+
+		// Normalize
 		public void Normalize(float target = 1)
 		{
 			// Abort if no data or playing
@@ -428,6 +447,8 @@ namespace GenericCuda
 			});
 		}
 
+
+		// Waveform
 		public Bitmap GetWaveform(PictureBox waveBox, long offset = 0, int samplesPerPixel = 1, Color? graphColor = null, Color? bgColor = null)
 		{
 			// Determine offset
@@ -484,6 +505,8 @@ namespace GenericCuda
 			return Math.Max(1, (int) Math.Ceiling((double) totalSamples / width));
 		}
 
+
+		// Chunking
 		public List<float[]> MakeChunks(int chunkSize, int overlap = 0)
 		{
 			// If overlap is 0 take half of chunk size
@@ -543,16 +566,7 @@ namespace GenericCuda
 			Data = aggregated;
 		}
 
-		public string GetMeta()
-		{
-			StringBuilder sb = new();
-			sb.Append(Samplerate / 1000 + " kHz, ");
-			sb.Append(Bitdepth + " b, ");
-			sb.Append(Channels + " ch, ");
-			sb.Append((Data.Length / Samplerate / Channels / Bitdepth / 8) + " s, ");
-			sb.Append(Data.LongLength + " samples");
-			return sb.ToString();
-		}
+		
 
 
 

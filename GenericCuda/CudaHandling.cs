@@ -7,7 +7,7 @@ namespace GenericCuda
 	public class CudaHandling
 	{
 		// ----- ATTRIBUTES ----- \\
-		private string Repopath;
+		public string Repopath;
 
 		public int DeviceId = 0;
 
@@ -25,6 +25,7 @@ namespace GenericCuda
 
 		public CudaMemoryHandling? MemH = null;
 		public CudaFftHandling? FftH = null;
+		public CudaKernelHandling? KernelH = null;
 
 
 
@@ -150,6 +151,7 @@ namespace GenericCuda
 			// Create memory handling & fft handling
 			MemH = new CudaMemoryHandling(this, Ctx, LogBox);
 			FftH = new CudaFftHandling(this, Ctx, LogBox);
+			KernelH = new CudaKernelHandling(this, Ctx, LogBox);
 
 			// Log
 			Log("Context initialized on device " + "Id: " + deviceId);
@@ -201,7 +203,22 @@ namespace GenericCuda
 			return [(int) usage[0], (int) usage[1], (int) usage[2]];
 		}
 
+		public void FillKernelsListbox(ListBox listBox_kernels)
+		{
+			listBox_kernels.Items.Clear();
 
+			// Fill with every file name in the kernels folder (PTX)
+			string kernelsPath = Path.Combine(Repopath, "Resources\\Kernels\\PTX");
+			string[] files = Directory.GetFiles(kernelsPath, "*.ptx");
+			foreach ( string file in files )
+			{
+				listBox_kernels.Items.Add(Path.GetFileNameWithoutExtension(file));
+			}
 
+			// Select no item
+			listBox_kernels.SelectedIndex = -1;
+		}
+
+		
 	}
 }
