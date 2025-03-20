@@ -69,11 +69,10 @@ namespace GenericCuda
 			hScrollBar_offset.Scroll += (s, e) => offset = hScrollBar_offset.Value;
 			listBox_tracks.SelectedIndexChanged += (s, e) => ToggleUI();
 			numericUpDown_loggingInterval.ValueChanged += (s, e) => CudaH.LogInterval = (int) numericUpDown_loggingInterval.Value;
-			numericUpDown_param2.Click += (s, e) => ToggleParam2();
-			panel_param2.Click += (s, e) => ToggleParam2();
 			panel_exportLog.MouseMove += (s, e) => ToggleUI();
 			button_export.MouseMove += (s, e) => ToggleUI();
 			listBox_kernels.SelectedIndexChanged += (s, e) => ToggleUI();
+			listBox_kernels.DoubleClick += (s, e) => button_loadKernel.PerformClick();
 
 
 			// Event handler for CTRL down
@@ -173,27 +172,6 @@ namespace GenericCuda
 
 			// Execute kernel button
 			button_executeKernel.Enabled = Initialized && Track != null && MemH != null && KernelH != null && KernelH.Kernel != null && CurrentPointer != 0 || SelectedKernelName == null;
-
-		}
-
-		public void ToggleParam2()
-		{
-			// Require CTRL down
-			if (ModifierKeys != Keys.Control)
-			{
-				return;
-			}
-
-			// Toggle numUD param2 enabled (on / off), set to 0 if disabled
-			numericUpDown_param2.Enabled = !numericUpDown_param2.Enabled;
-			numericUpDown_param2.Value = numericUpDown_param2.Enabled ? 1 : 0;
-
-			// Adjust label color to grey if disabled
-			label_param2.ForeColor = numericUpDown_param2.Enabled ? Color.Black : Color.Gray;
-
-			// Adjust label toggle info to grey if enabled, else to black
-			label_toggleParam2.Text = numericUpDown_param2.Enabled ? "CTRL-click to disable" : "CTRL-click to enable";
-			label_toggleParam2.ForeColor = numericUpDown_param2.Enabled ? Color.Gray : Color.Black;
 
 		}
 
@@ -505,10 +483,10 @@ namespace GenericCuda
 			}
 
 			// Get all controls with "numericUpDown_param" in name with their number ordered
-			var paramControls = Controls.OfType<NumericUpDown>().Where(c => c.Name.Contains("numericUpDown_param")).OrderBy(c => c.Name.Substring(18));
+			NumericUpDown[] paramControls = panel_kernelParams.Controls.OfType<NumericUpDown>().Where(c => c.Name.Contains("numericUpDown_param")).OrderBy(c => int.Parse(c.Name.Replace("numericUpDown_param", ""))).ToArray();
 
 			// DEBUG log
-			KernelH.Log("Found " + paramControls.Count() + " parameters for kernel execution", "", 2);
+			KernelH.Log("Found " + paramControls.Length + " parameters for kernel execution", "", 2);
 
 			// Get parameter values as object array
 			object[] paramValues = paramControls.Select(c => (object) c.Value).ToArray();

@@ -640,10 +640,11 @@ namespace GenericCuda
 				Log("No input variables found", "", 1);
 				return;
 			}
-
-			// Remove parameter with name.tolower() == "n", "size", "length", "count" (first parameter <int>)
-			int indexOfInt = Array.FindIndex(parameters, x => x.GetType() == typeof(int));
-			parameters = parameters.Where((x, i) => i != indexOfInt).ToArray();
+			if (parameters.Length != KernelParameters.Count - 2)
+			{
+				Log("Parameter count mismatch", "Expected: (" + KernelParameters.Count + " - 2)" + ", Got: " + parameters.Length, 1);
+				return;
+			}
 
 			// Get input variables
 			CUdeviceptr[] pointers = MemH.GetPointersFromIndex(indexPointer, out int[] sizes);

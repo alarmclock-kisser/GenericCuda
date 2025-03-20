@@ -54,12 +54,6 @@
 			listBox_kernels = new ListBox();
 			button_loadKernel = new Button();
 			button_executeKernel = new Button();
-			numericUpDown_param1 = new NumericUpDown();
-			label_param1 = new Label();
-			label_param2 = new Label();
-			numericUpDown_param2 = new NumericUpDown();
-			panel_param2 = new Panel();
-			label_toggleParam2 = new Label();
 			label_kernelLoaded = new Label();
 			panel_kernelParams = new Panel();
 			((System.ComponentModel.ISupportInitialize) pictureBox_wave).BeginInit();
@@ -67,9 +61,6 @@
 			panel_exportLog.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_loggingInterval).BeginInit();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).BeginInit();
-			((System.ComponentModel.ISupportInitialize) numericUpDown_param1).BeginInit();
-			((System.ComponentModel.ISupportInitialize) numericUpDown_param2).BeginInit();
-			panel_param2.SuspendLayout();
 			SuspendLayout();
 			// 
 			// listBox_log
@@ -331,65 +322,6 @@
 			button_executeKernel.UseVisualStyleBackColor = false;
 			button_executeKernel.Click += button_executeKernel_Click;
 			// 
-			// numericUpDown_param1
-			// 
-			numericUpDown_param1.DecimalPlaces = 12;
-			numericUpDown_param1.Increment = new decimal(new int[] { 5, 0, 0, 262144 });
-			numericUpDown_param1.Location = new Point(592, 12);
-			numericUpDown_param1.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
-			numericUpDown_param1.Minimum = new decimal(new int[] { 1, 0, 0, 196608 });
-			numericUpDown_param1.Name = "numericUpDown_param1";
-			numericUpDown_param1.Size = new Size(118, 23);
-			numericUpDown_param1.TabIndex = 16;
-			numericUpDown_param1.Value = new decimal(new int[] { 1, 0, 0, 0 });
-			// 
-			// label_param1
-			// 
-			label_param1.AutoSize = true;
-			label_param1.Location = new Point(716, 14);
-			label_param1.Name = "label_param1";
-			label_param1.Size = new Size(47, 15);
-			label_param1.TabIndex = 17;
-			label_param1.Text = "Param1";
-			// 
-			// label_param2
-			// 
-			label_param2.AutoSize = true;
-			label_param2.Location = new Point(716, 43);
-			label_param2.Name = "label_param2";
-			label_param2.Size = new Size(47, 15);
-			label_param2.TabIndex = 19;
-			label_param2.Text = "Param2";
-			// 
-			// numericUpDown_param2
-			// 
-			numericUpDown_param2.DecimalPlaces = 2;
-			numericUpDown_param2.Enabled = false;
-			numericUpDown_param2.Location = new Point(0, 0);
-			numericUpDown_param2.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
-			numericUpDown_param2.Name = "numericUpDown_param2";
-			numericUpDown_param2.Size = new Size(118, 23);
-			numericUpDown_param2.TabIndex = 18;
-			// 
-			// panel_param2
-			// 
-			panel_param2.Controls.Add(numericUpDown_param2);
-			panel_param2.Location = new Point(592, 41);
-			panel_param2.Name = "panel_param2";
-			panel_param2.Size = new Size(118, 23);
-			panel_param2.TabIndex = 20;
-			// 
-			// label_toggleParam2
-			// 
-			label_toggleParam2.AutoSize = true;
-			label_toggleParam2.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point,  0);
-			label_toggleParam2.ForeColor = Color.Black;
-			label_toggleParam2.Location = new Point(592, 67);
-			label_toggleParam2.Name = "label_toggleParam2";
-			label_toggleParam2.Size = new Size(109, 13);
-			label_toggleParam2.TabIndex = 21;
-			label_toggleParam2.Text = "CTRL-click to enable";
-			// 
 			// label_kernelLoaded
 			// 
 			label_kernelLoaded.AutoSize = true;
@@ -415,11 +347,6 @@
 			ClientSize = new Size(844, 991);
 			Controls.Add(panel_kernelParams);
 			Controls.Add(label_kernelLoaded);
-			Controls.Add(label_toggleParam2);
-			Controls.Add(panel_param2);
-			Controls.Add(label_param2);
-			Controls.Add(label_param1);
-			Controls.Add(numericUpDown_param1);
 			Controls.Add(button_executeKernel);
 			Controls.Add(button_loadKernel);
 			Controls.Add(listBox_kernels);
@@ -445,9 +372,6 @@
 			panel_exportLog.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize) numericUpDown_loggingInterval).EndInit();
 			((System.ComponentModel.ISupportInitialize) numericUpDown_chunkSize).EndInit();
-			((System.ComponentModel.ISupportInitialize) numericUpDown_param1).EndInit();
-			((System.ComponentModel.ISupportInitialize) numericUpDown_param2).EndInit();
-			panel_param2.ResumeLayout(false);
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -479,12 +403,6 @@
 		private ListBox listBox_kernels;
 		private Button button_loadKernel;
 		private Button button_executeKernel;
-		private NumericUpDown numericUpDown_param1;
-		private Label label_param1;
-		private Label label_param2;
-		private NumericUpDown numericUpDown_param2;
-		private Panel panel_param2;
-		private Label label_toggleParam2;
 		private Panel panel_exportLog;
 		private Label label_kernelLoaded;
 		private Panel panel_kernelParams;

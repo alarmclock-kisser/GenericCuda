@@ -86,7 +86,7 @@
 			}
 
 			// Abort if count is 0
-			if (count == 0)
+			if (count == 0 || Parameters == null)
 			{
 				ParamsPanel.Enabled = false;
 				ParamsPanel.Visible = false;
@@ -99,8 +99,18 @@
 				return;
 			}
 
+			// Copy parameters to local dictionary
+			Dictionary<string, Type> parameters = new(Parameters);
+
 			// Set panel size (height is 29 per param) + 6 for padding
 			ParamsPanel.Height = 29 * count + 6;
+
+			// Skip (remove) first int32 type parameter
+			parameters.Remove(Parameters.First(x => x.Value.Name == "Int32").Key);
+			if (!silent)
+			{
+				Log("Removed first Int32 parameter", "First int parameter is always the input pointer", 2);
+			}
 
 			// Log
 			if (!silent)
@@ -110,29 +120,18 @@
 
 			// Generate controls for each parameter (Label(type : name) + NumericUpDown(value, width until end of Panel, consicer padding / margin))
 			int i = 0;
-			foreach (var param in Parameters!)
+			foreach (var param in parameters)
 			{
 				// Skip (continue) if name is caps
 				if (param.Key == param.Key.ToUpper())
 				{
 					// Remove entry from dictionary
-					Parameters.Remove(Parameters.First(x => x.Key == param.Key).Key);
+					parameters.Remove(Parameters.First(x => x.Key == param.Key).Key);
 
 					// Log
 					if (!silent)
 					{
 						Log("Found param for input pointer", "Name is in caps: " + param.Key, 2);
-					}
-					continue;
-				}
-
-				// Skip first index of type int (it's the size of the array)
-				if (i < 2 && param.Value.Name == "Int32")
-				{
-					// Log
-					if (!silent)
-					{
-						Log("Found param for array size", "Name: " + param.Key, 2);
 					}
 					continue;
 				}
@@ -153,11 +152,11 @@
 				Label label = new()
 				{
 					Name = "label_param" + i,
-					Text = param.Key,
+					Text = "'" + param.Key + "'",
 					Location = new Point(3, 3 + 29 * i),
 					Width = 80,
 					TextAlign = ContentAlignment.MiddleLeft,
-					Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right
+					Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right,
 				};
 
 				// Create ToolTip with param name (shows after 100ms)
@@ -170,7 +169,7 @@
 				};
 
 				// Set ToolTip for Label
-				tip.SetToolTip(label, "'" + type + "'");
+				tip.SetToolTip(label, type);
 
 				// Create NumericUpDown
 				NumericUpDown num = new()
