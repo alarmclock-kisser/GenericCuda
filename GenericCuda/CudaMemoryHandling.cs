@@ -268,12 +268,12 @@ namespace GenericCuda
 			return chunks;
 		}
 
-		public long PushData<T>(T[] data, int chunkSize) where T : unmanaged
+		public long PushData<T>(T[] data, int chunkSize, bool silent = false) where T : unmanaged
 		{
 			var chunks = MakeChunks(data, chunkSize);
 
 			// Abort if no chunks
-			if (chunks.Count == 0)
+			if (chunks.Count == 0 && !silent)
 			{
 				this.Log("No chunks to push data", "Chunks.Count: " + chunks.Count, 1);
 				return 0;
@@ -285,8 +285,11 @@ namespace GenericCuda
 			CUdeviceptr[] pointers = new CUdeviceptr[chunks.Count];
 
 			// Pre log
-			this.Log("Pushing data to device", "Chunks.Count: " + chunks.Count, 1);
-			this.Log("");
+			if (!silent)
+			{
+				this.Log("Pushing data to device", "Chunks.Count: " + chunks.Count, 1);
+				this.Log("");
+			}
 
 			// Allocate memory for every chunk
 			for (int i = 0; i < chunks.Count; i++)
@@ -304,7 +307,7 @@ namespace GenericCuda
 				pointers[i] = buffers[i].DevicePointer;
 
 				// Log
-				if (i % LogInterval == 0)
+				if (i % LogInterval == 0 && !silent)
 				{
 					this.Log("Data pushed to device", "Chunk: " + i + " / " + chunks.Count, 2, true);
 				}
@@ -312,7 +315,7 @@ namespace GenericCuda
 
 			// Get index pointer
 			long indexPointer = buffers.FirstOrDefault()?.DevicePointer.Pointer ?? 0;
-			if (indexPointer == 0)
+			if (indexPointer == 0 && !silent)
 			{
 				this.Log("Failed to get index pointer", "Ptr: " + indexPointer, 1);
 				return 0;
@@ -322,23 +325,28 @@ namespace GenericCuda
 			Buffers.Add(pointers, sizes);
 
 			// Log
-			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
+			if (!silent)
+			{
+				this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
+			}
 
 			// Return index pointer
 			return indexPointer;
-
 		}
 
-		public long PushData<T>(List<T[]> chunks) where T : unmanaged
+		public long PushData<T>(List<T[]> chunks, bool silent = false) where T : unmanaged
 		{
 			// Create CudaDeviceVariable array & int[]
 			CudaDeviceVariable<T>[] buffers = new CudaDeviceVariable<T>[chunks.Count];
 			int[] sizes = new int[chunks.Count];
 			CUdeviceptr[] pointers = new CUdeviceptr[chunks.Count];
-			
+
 			// Pre log
-			this.Log("Pushing data to device", "Chunks.Count: " + chunks.Count, 1);
-			this.Log("");
+			if (!silent)
+			{
+				this.Log("Pushing data to device", "Chunks.Count: " + chunks.Count, 1);
+				this.Log("");
+			}
 			
 			// Allocate memory for every chunk
 			for (int i = 0; i < chunks.Count; i++)
@@ -356,7 +364,7 @@ namespace GenericCuda
 				pointers[i] = buffers[i].DevicePointer;
 				
 				// Log
-				if (i % LogInterval == 0)
+				if (i % LogInterval == 0 && !silent)
 				{
 					this.Log("Data pushed to device", "Chunk: " + i + " / " + chunks.Count, 2, true);
 				}
@@ -364,7 +372,7 @@ namespace GenericCuda
 			
 			// Get index pointer
 			long indexPointer = buffers.FirstOrDefault()?.DevicePointer.Pointer ?? 0;
-			if (indexPointer == 0)
+			if (indexPointer == 0 && !silent)
 			{
 				this.Log("Failed to get index pointer", "Ptr: " + indexPointer, 1);
 				return 0;
@@ -372,18 +380,21 @@ namespace GenericCuda
 			
 			// Add to Buffers
 			Buffers.Add(pointers, sizes);
-			
+
 			// Log
-			this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
+			if (!silent)
+			{
+				this.Log("Data pushed to device", "IndexPtr: " + indexPointer, 1, true);
+			}
 			
 			// Return index pointer
 			return indexPointer;
 		}
 
-		public List<T[]> PullData<T>(long pointer, bool aggregate = false) where T : unmanaged
+		public List<T[]> PullData<T>(long pointer, bool aggregate = false, bool silent = false) where T : unmanaged
 		{
 			// Lookup pointer
-			if (!IndexPointers.Contains(pointer))
+			if (!IndexPointers.Contains(pointer) && !silent)
 			{
 				this.Log("Pointer not found", "Ptr: " + pointer, 1);
 				return [];
@@ -393,7 +404,7 @@ namespace GenericCuda
 			var pointers = GetPointersFromIndex(pointer, out int[] sizes);
 
 			// Abort if no pointers
-			if (pointers.Length == 0)
+			if (pointers.Length == 0 && !silent)
 			{
 				this.Log("No pointers found for index pointer", "Ptr: " + pointer, 1);
 				return [];
@@ -403,43 +414,53 @@ namespace GenericCuda
 			List<T[]> data = [];
 
 			// Pre log
-			this.Log("Pulling data from device", "Pointers.Length: " + pointers.Length, 1);
-			this.Log("");
-
-			// Pull data from every pointer
-			for (int i = 0; i < pointers.Length; i++)
+			if (!silent)
 			{
-				// Get buffer from pointer
-				var buf = pointers[i];
+				this.Log("Pulling data from device", "Pointers.Length: " + pointers.Length, 1);
+				this.Log("");
 
-				// Copy data from buffer
-				T[] chunk = new T[sizes[i]];
-				Ctx.CopyToHost(chunk, buf);
 
-				// Add chunk to data
-				data.Add(chunk);
-				
-				// Log
-				if (i % LogInterval == 0)
+				// Pull data from every pointer
+				for (int i = 0; i < pointers.Length; i++)
 				{
-					this.Log("Data pulled from device", "Chunk: " + i + " / " + pointers.Length, 2, true);
+					// Get buffer from pointer
+					var buf = pointers[i];
+
+					// Copy data from buffer
+					T[] chunk = new T[sizes[i]];
+					Ctx.CopyToHost(chunk, buf);
+
+					// Add chunk to data
+					data.Add(chunk);
+
+					// Log
+					if (i % LogInterval == 0 && !silent)
+					{
+						this.Log("Data pulled from device", "Chunk: " + i + " / " + pointers.Length, 2, true);
+					}
+				}
+
+				// Aggregate data
+				if (aggregate)
+				{
+					T[] result = data.SelectMany(x => x).ToArray();
+
+					// Log
+					if (!silent)
+					{
+						this.Log("Data pulled from device", "Length: " + result.Length, 1);
+					}
+
+					// Return data
+					return [result];
+				}
+
+				// Log
+				if (!silent)
+				{
+					this.Log("Data pulled from device", "Count: " + data.Count + " ,Total Length: " + data.Sum(x => x.Length), 1);
 				}
 			}
-
-			// Aggregate data
-			if (aggregate)
-			{
-				T[] result = data.SelectMany(x => x).ToArray();
-
-				// Log
-				this.Log("Data pulled from device", "Length: " + result.Length, 1);
-
-				// Return data
-				return [result];
-			}
-
-			// Log
-			this.Log("Data pulled from device", "Count: " + data.Count + " ,Total Length: " + data.Sum(x => x.Length), 1);
 
 			// Return data
 			return data;

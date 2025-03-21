@@ -37,6 +37,7 @@
 
 
 		// ----- METHODS ----- \\
+		// Log
 		public void Log(string message, string inner = "", int layer = 1, bool update = false)
 		{
 			string msg = "[" + DateTime.Now.ToString("HH:mm:ss.fff") + "] ";
@@ -66,6 +67,7 @@
 		}
 
 
+		// BuildParameters
 		public void BuildParameters(bool silent = false)
 		{
 			// Remove every Control from the panel
@@ -202,6 +204,8 @@
 			ParamsPanel.Visible = true;
 		}
 
+
+		// GetStringWidth
 		public int GetStringWidth(string text = "", Control? control = null)
 		{
 			// If control is null, return default TextRenderer result

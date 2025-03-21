@@ -56,6 +56,7 @@
 			button_executeKernel = new Button();
 			label_kernelLoaded = new Label();
 			panel_kernelParams = new Panel();
+			checkBox_dataMode = new CheckBox();
 			((System.ComponentModel.ISupportInitialize) pictureBox_wave).BeginInit();
 			groupBox_controls.SuspendLayout();
 			panel_exportLog.SuspendLayout();
@@ -339,12 +340,24 @@
 			panel_kernelParams.Size = new Size(240, 77);
 			panel_kernelParams.TabIndex = 23;
 			// 
+			// checkBox_dataMode
+			// 
+			checkBox_dataMode.AutoSize = true;
+			checkBox_dataMode.Location = new Point(592, 635);
+			checkBox_dataMode.Name = "checkBox_dataMode";
+			checkBox_dataMode.Size = new Size(147, 19);
+			checkBox_dataMode.TabIndex = 24;
+			checkBox_dataMode.Text = "Data device only mode";
+			checkBox_dataMode.UseVisualStyleBackColor = true;
+			checkBox_dataMode.CheckedChanged += checkBox_dataMode_CheckedChanged;
+			// 
 			// MainView
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackColor = SystemColors.ButtonFace;
 			ClientSize = new Size(844, 991);
+			Controls.Add(checkBox_dataMode);
 			Controls.Add(panel_kernelParams);
 			Controls.Add(label_kernelLoaded);
 			Controls.Add(button_executeKernel);
@@ -406,5 +419,6 @@
 		private Panel panel_exportLog;
 		private Label label_kernelLoaded;
 		private Panel panel_kernelParams;
+		private CheckBox checkBox_dataMode;
 	}
 }

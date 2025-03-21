@@ -172,12 +172,12 @@ namespace GenericCuda
 			string[] lines = kernelString.Split('\n');
 
 			// Get line index  with "__global__ void "
-			int index = Array.FindIndex(lines, x => x.Contains("__global__ void " + kernelName));
+			int index = Array.FindIndex(lines, x => x.Contains("void " + kernelName));
 			if (index == -1)
 			{
 				if (!silent)
 				{
-					Log("Fatal error: '__global__ void ' not found", "This should have been prevented by PrecompileKernelString()", 2);
+					Log("Fatal error: 'void '" + kernelName + " not found", "This should have been prevented by PrecompileKernelString()", 2);
 				}
 				return parametersDict;
 			}
@@ -249,12 +249,22 @@ namespace GenericCuda
 				return null;
 			}
 
-			// Check contains "__global__ void "
-			if (!kernelString.Contains("__global__ void "))
+			// Check contains "__global__ "
+			if (!kernelString.Contains("__global__"))
 			{
 				if (!silent)
 				{
-					Log("Kernel string does not contain '__global__ void '", "", 1);
+					Log("Kernel string does not contain '__global__'", "", 1);
+				}
+				return null;
+			}
+
+			// Check contains "void "
+			if (!kernelString.Contains("void "))
+			{
+				if (!silent)
+				{
+					Log("Kernel string does not contain 'void '", "", 1);
 				}
 				return null;
 			}
@@ -311,7 +321,7 @@ namespace GenericCuda
 			}
 
 			// Get name between "void " and "("
-			int start = kernelString.IndexOf("__global__ void ") + "__global__ void ".Length;
+			int start = kernelString.IndexOf("void ") + "void ".Length;
 			int end = kernelString.IndexOf("(", start);
 			string name = kernelString.Substring(start, end - start);
 
@@ -400,7 +410,7 @@ namespace GenericCuda
 				return "";
 			}
 
-			string kernelName = kernelString.Split("__global__ void ")[1].Split("(")[0];
+			string kernelName = kernelString.Split("void ")[1].Split("(")[0];
 			kernelName = kernelName.Replace("Kernel", "");
 
 			string logpath = Path.Combine(Repopath, "Resources\\Logs", kernelName + "Kernel" + ".log");

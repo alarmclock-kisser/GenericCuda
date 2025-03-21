@@ -66,6 +66,7 @@ namespace GenericCuda
 
 
 			// Register events
+			comboBox_devices.SelectedIndexChanged += (s, e) => ToggleUI();
 			hScrollBar_offset.Scroll += (s, e) => offset = hScrollBar_offset.Value;
 			listBox_tracks.SelectedIndexChanged += (s, e) => ToggleUI();
 			numericUpDown_loggingInterval.ValueChanged += (s, e) => CudaH.LogInterval = (int) numericUpDown_loggingInterval.Value;
@@ -133,6 +134,9 @@ namespace GenericCuda
 			// Set kernel loaded label
 			label_kernelLoaded.Text = KernelH?.Kernel != null ? KernelH.Kernel.KernelName : "No kernel loaded";
 
+			// Checkbox data mode
+			checkBox_dataMode.Enabled = Initialized;
+
 			// Set offset
 			hScrollBar_offset.Value = offset;
 
@@ -142,12 +146,18 @@ namespace GenericCuda
 			// Add vertical scrollbar if lines in textbox > 25 (always horizontal)
 			textBox_kernelString.ScrollBars = textBox_kernelString.Lines.Length > 25 ? ScrollBars.Both : ScrollBars.Horizontal;
 
+			// Remove "Kernel" substring from textbox
+			if (textBox_kernelString.Text.Contains("Kernel"))
+			{
+				textBox_kernelString.Text = textBox_kernelString.Text.Replace("Kernel", "");
+			}
+
 			// Playback button
 			button_playback.Enabled = Track != null && Track.OnHost;
 
 			// Move button
-			button_move.Enabled = Track != null && MemH != null;
-			button_move.Text = Track != null && Track.OnHost ? "Move to device" : "Move to host";
+			button_move.Enabled = Track != null && MemH != null && !checkBox_dataMode.Checked;
+			button_move.Text = Track != null && Track.OnHost ? "-> Dev" : "Host <-";
 
 			// Import button
 			button_import.Enabled = Initialized;
@@ -234,6 +244,45 @@ namespace GenericCuda
 			checkBox_overwrite.Text = checkBox_overwrite.Checked ? "Overwrite (!)" : "Overwrite?";
 		}
 
+		private void checkBox_dataMode_CheckedChanged(object sender, EventArgs e)
+		{
+			// Abort if not Initialized
+			if (!Initialized || MemH == null)
+			{
+				// MsgBox
+				MessageBox.Show("No memory handling available", "Data mode failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				checkBox_dataMode.Checked = false;
+				return;
+			}
+
+			// Toggle color to green if checked, else to black
+			checkBox_dataMode.ForeColor = checkBox_dataMode.Checked ? Color.DarkGreen : Color.Black;
+			checkBox_dataMode.Text = checkBox_dataMode.Checked ? "Data only on device" : "Data device only mode?";
+
+			if (checkBox_dataMode.Checked)
+			{
+				// Get list of all tracks on host
+				List<AudioObject> tracksOnHost = AudioH.Tracks.Where(t => t.OnHost).ToList();
+
+				// Move every track to device (silent)
+				foreach (AudioObject track in tracksOnHost)
+				{
+					var chunks = track.MakeChunks((int) numericUpDown_chunkSize.Value);
+					track.Pointer = MemH.PushData(chunks, true);
+					track.Data = [];
+				}
+
+				// Log
+				if (tracksOnHost.Count > 0)
+				{
+					CudaH.Log("Moved " + tracksOnHost.Count + " tracks to device", "Data mode activated", 1);
+				}
+			}
+
+			ToggleUI();
+		}
+
+
 
 		// I/O
 		private void button_import_Click(object sender, EventArgs e)
@@ -254,13 +303,25 @@ namespace GenericCuda
 				foreach (string pth in ofd.FileNames)
 				{
 					AudioH.AddTrack(pth);
+
+					// Move if data mode is active
+					if (checkBox_dataMode.Checked && MemH != null)
+					{
+						// Get last track
+						AudioObject track = AudioH.Tracks.Last();
+
+						// Make chunks of track data
+						var chunks = track.MakeChunks((int) numericUpDown_chunkSize.Value);
+						track.Pointer = MemH.PushData(chunks, true);
+						track.Data = [];
+					}
 				}
+
+				// Select last entry in tracks listbox
+				listBox_tracks.SelectedIndex = listBox_tracks.Items.Count - 1;
+
+				ToggleUI();
 			}
-
-			// Select last entry in tracks listbox
-			listBox_tracks.SelectedIndex = listBox_tracks.Items.Count - 1;
-
-			ToggleUI();
 		}
 
 		private void button_export_Click(object sender, EventArgs e)
@@ -463,12 +524,12 @@ namespace GenericCuda
 			KernelH.LoadKernelByName(SelectedKernelEntry.Replace("Kernel", "") ?? "");
 
 			// Set kernel string to textbox if empty and kernel loaded
-			if (textBox_kernelString.Text.Trim() == string.Empty && KernelH?.Kernel != null)
+			if (KernelH?.Kernel != null)
 			{
 				textBox_kernelString.Text = KernelH.KernelString ?? "";
 			}
 
-			Builder.BuildParameters(false);
+			Builder?.BuildParameters(false);
 			ToggleUI();
 		}
 
@@ -500,8 +561,6 @@ namespace GenericCuda
 
 			ToggleUI();
 		}
-
-		
 
 		
 	}
